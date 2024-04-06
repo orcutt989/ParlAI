@@ -2,3 +2,4 @@ gitpython
 markdown
 py-gfm
 parlai
+distutils
