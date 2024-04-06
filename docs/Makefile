@@ -28,11 +28,11 @@ clean:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	rm -f source/agent_refs/*
-	cd "${SOURCEDIR}"; python generate_agent_list.py
-	cd "${SOURCEDIR}"; python generate_task_list.py
-	cd "${SOURCEDIR}"; python generate_zoo_list.py
-	cd "${SOURCEDIR}"; python generate_mutator_list.py
-	cd "${SOURCEDIR}"; python generate_metric_list.py
-	cd "${SOURCEDIR}"; python generate_cli.py
-	cd "${SOURCEDIR}"; python generate_opt_presets.py
+	cd "${SOURCEDIR}"; python3 generate_agent_list.py
+	cd "${SOURCEDIR}"; python3 generate_task_list.py
+	cd "${SOURCEDIR}"; python3 generate_zoo_list.py
+	cd "${SOURCEDIR}"; python3 generate_mutator_list.py
+	cd "${SOURCEDIR}"; python3 generate_metric_list.py
+	cd "${SOURCEDIR}"; python3 generate_cli.py
+	cd "${SOURCEDIR}"; python3 generate_opt_presets.py
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
