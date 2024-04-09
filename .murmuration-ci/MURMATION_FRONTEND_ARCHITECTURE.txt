@@ -1,0 +1,236 @@
+Five ways to serve a static site on AWS in order of complexity/cost.
+
+Each .ts file corresponds to the following named solutions.  
+The ci.yaml file will be the same for each since we're using Pulumi as our IaaC.
+
+Because its only a static site there won't be any databases, load balancers, or server-side code.
+
+Amazon S3:
+Benefits:
+Highly scalable and durable storage for static files.
+Low cost for storage and data transfer.
+Easily integrates with CloudFront CDN for global content delivery.
+Simple configuration for static website hosting with index and error documents.
+Drawbacks:
+Limited to serving static content only (HTML, CSS, JavaScript, images).
+No support for dynamic server-side processing or backend logic.
+Requires manual upload or CI/CD integration for deploying updates.
+
+      /-------------------\
+      |      [Users]      |  - Represents users accessing the website.
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |      [CDN]        |  - Content Delivery Network (CloudFront) for caching and delivering content.
+      |     [CloudFront]  |  - Accelerates content delivery and improves user experience.
+      |  (Static Content)|
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |   [Amazon S3]     |  - Simple Storage Service for hosting static website files.
+      |   [S3 Bucket]     |  - Provides scalable and durable storage for objects.
+      \-------------------/
+                |
+                v
+      /-------------------\
+      | [Amazon CloudWatch]| - Monitoring and management service.
+      | [Monitoring]     |  - Monitors system metrics and provides insights.
+      \-------------------/
+
+
+AWS Lambda:
+Benefits:
+Serverless approach with automatic scaling and pay-as-you-go pricing.
+Supports executing code in response to HTTP requests via API Gateway.
+Ideal for dynamic content generation or server-side rendering for static sites.
+Integration with other AWS services for data processing, authentication, etc.
+Drawbacks:
+Limited to short-lived executions (15 minutes max) and constrained memory/CPU.
+Cold start latency may affect response times for infrequently accessed sites.
+Cost may vary based on invocation frequency and resource utilization.
+Not designed for long-running or stateful applications compared to traditional servers.
+
+Lambda Function for Static Content:
+
+In the Lambda function, you would include the static files (HTML, CSS, JavaScript, images, etc.) directly in the code or package them as part of the deployment package.
+The Lambda function would handle HTTP requests, read the requested file from its internal storage, and return the file's content as the HTTP response.
+
+API Gateway:
+An API Gateway endpoint would be set up to trigger the Lambda function in response to HTTP requests.
+The API Gateway would route requests to the Lambda function based on the requested URL paths.
+
+Content Delivery:
+Since Lambda is not optimized for serving static files like S3 or CDNs, content delivery performance and caching would be limited.
+You would not benefit from features like edge caching, automatic gzip compression, or optimized content delivery paths that CDNs provide.
+
+Monitoring and Scalability:
+You would need to implement custom monitoring within the Lambda function to track performance metrics and errors.
+Scalability would depend on Lambda's auto-scaling behavior, which may have limitations compared to S3 or CDN-based solutions for high-traffic websites.
+While it's technically feasible to host a static website using Lambda without S3, it's generally not recommended for production-scale applications due to the following reasons:
+
+Performance: Lambda may not offer the same level of performance and caching capabilities as dedicated static file hosting services like S3 or CDNs.
+Cost: Serving static content from Lambda may incur higher costs compared to using S3, especially for high-traffic websites due to Lambda's invocation and compute costs.
+Complexity: Managing and deploying a large number of static files within a Lambda function can increase complexity, deployment time, and maintenance overhead.
+
+
+      /--------------------------\
+      |      [Users]             |  - Represents users accessing the website.
+      \--------------------------/
+            |
+            v
+      /--------------------------\
+      |   [Amazon CloudFront]    |  - CDN for caching and delivering static content.
+      |   [Content Delivery]     |  - Delivers static assets efficiently.
+      \--------------------------/
+            |
+            v
+      /--------------------------\
+      |   [AWS Lambda Function]  |  - Serves dynamic content and APIs.
+      |   [Node.js Runtime]      |  - Handles server-side logic and requests.
+      |   [CloudWatch Monitoring] | - Monitors Lambda performance and errors.
+      \--------------------------/
+
+Amplify:
+Benefits:
+Rapid deployment and hosting of static sites with a streamlined CLI and UI.
+Integrated CI/CD pipeline for automatic deployments from Git repositories.
+Built-in support for custom domains, SSL certificates, and CDN configuration.
+Simplified management of authentication, analytics, and other features.
+Drawbacks:
+Limited flexibility for advanced configurations or custom infrastructure setups.
+May not be suitable for highly customized or complex web applications.
+Cost structure may vary based on usage and additional features.
+
+      /-------------------\
+      |      [Users]      |  - Represents users accessing the ParlAI website.
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |      [Amplify]    |  - AWS Amplify for continuous deployment, hosting, and CDN.
+      |    [App & API]    |  - Hosts the static website and provides API functionality.
+      |  [Amplify CDN]    |  - Integrated CDN for content delivery and caching.
+      | [Monitoring &     |  - Monitoring system for performance, uptime, and errors.      |   Management]     |  - Utilizes Amazon CloudWatch for monitoring.
+      \-------------------/
+                |
+      /---------|---------\
+      |         v         |
+      |   [GitHub Repo]  |  - Stores website source code and assets (optional).
+      \-------------------/
+                |
+      | [OR] (Choose one) |
+                |
+                v
+      /-------------------\
+      |        [S3]       |  - Amazon S3 bucket for storing website files (optional).
+      |  [Static Hosting] |  - Serves static website files to Amplify.
+      \-------------------/
+
+
+Elastic Beanstalk:
+Benefits:
+Easy deployment and management of web applications including static sites.
+Supports multiple programming languages and platforms.
+Automated provisioning of resources like EC2 instances, load balancers, and auto-scaling.
+Integrated monitoring and logging with AWS CloudWatch.
+Drawbacks:
+Adds complexity for static site hosting compared to simpler solutions like S3.
+Additional costs for managing and scaling underlying infrastructure.
+Limited flexibility for customization compared to fully-managed services.
+
+      /-------------------\
+      |      [Users]      |  - Represents users accessing the ParlAI website.
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |     [Elastic      |  - AWS Elastic Beanstalk for deploying and managing web applications.
+      |     Beanstalk]    |  - Hosts the ParlAI web application with auto-scaling capabilities.
+      |  [Application]    |  - Deployed application with load balancing and scalability.
+      |   [Auto Scaling]  |  - Automatically adjusts server capacity based on traffic.
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |       [S3]        |  - Amazon S3 for storing website files and assets.
+      |  [Static Hosting] |  - Serves static website files to Elastic Beanstalk.
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |       [CDN]       |  - Content Delivery Network for caching and delivering static content.
+      |     [Amazon S3]   |  - Storage for static files like images, CSS, and JavaScript.
+      |  (Static Content) |
+      \-------------------/
+                |
+                v
+      /----------------------\
+      | [Amazon CloudWatch]  | - Monitoring and management service.
+      | [Monitoring System]  | - Monitors server performance, uptime, and security.
+      \----------------------/
+
+
+Kubernetes:
+Benefits:
+Highly scalable and customizable container orchestration platform.
+Supports complex deployments with microservices, APIs, and server-side logic.
+Provides advanced networking, storage, and monitoring capabilities.
+Can be deployed on-premises or in hybrid cloud environments.
+Drawbacks:
+Steeper learning curve and complexity compared to other solutions for static sites.
+Requires expertise in containerization, Kubernetes configuration, and management.
+Higher resource overhead and potential cost implications for smaller deployments.
+
+      /-------------------\
+      |      [Users]      |  - Represents users accessing the ParlAI website.
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |       [EKS]       |  - Amazon EKS cluster for managing Kubernetes resources.
+      |    [Cluster &     |  - Orchestrates Docker containers for the ParlAI web app.
+      |    Worker Nodes]  |  - Manages scaling, load balancing, and deployment.
+      \-------------------/
+                |
+      /---------|---------\
+      |         v         |
+      |   [Kubernetes]    |  - Kubernetes Deployment for ParlAI web server.
+      |  [Docker Image]   |  - Runs the custom Docker image containing the web app.
+      |  [Replicas: 2]    |  - Ensures high availability with 2 replicas.
+      \-------------------/
+                |
+      /---------|---------\
+      |         v         |
+      |   [Kubernetes]    |  - Kubernetes Service for the web server deployment.
+      |   [LoadBalancer]  |  - Exposes the web server to external traffic.
+      |  [Service Port:   |  - Routes traffic on port 80 to the web server.
+      |     80]           |
+      \-------------------/
+                |
+      /---------|---------\
+      |         v         |
+      |   [Amazon ECR]    |  - Amazon ECR repository for storing the Docker image.
+      |  [Docker Image]   |  - Stores the custom Docker image for the web server.
+      |  [Image Version:  |  - Versioned image for deployment and scaling.
+      |     latest]       |
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |       [S3]        |  - Optional: Amazon S3 bucket for storing static content.
+      |  [Static Hosting] |  - Serves static files like CSS, images, and JavaScript.
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |       [CDN]       |  - Optional: Content Delivery Network for caching and delivery.
+      |     [CloudFront]  |  - Accelerates content delivery globally to users.
+      \-------------------/
+                |
+                v
+      /----------------------\
+      | [Amazon CloudWatch]  | - Monitoring and management service.
+      | [Monitoring System]  | - Monitors cluster performance, scaling, and errors.
+      \----------------------/
