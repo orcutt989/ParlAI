@@ -146,10 +146,9 @@ Limited flexibility for customization compared to fully-managed services.
                 |
                 v
       /-------------------\
-      |     [Elastic      |  - AWS Elastic Beanstalk for deploying and managing web applications.
-      |     Beanstalk]    |  - Hosts the ParlAI web application with auto-scaling capabilities.
-      |  [Application]    |  - Deployed application with load balancing and scalability.
-      |   [Auto Scaling]  |  - Automatically adjusts server capacity based on traffic.
+      |       [CDN]       |  - Content Delivery Network for caching and delivering static content.
+      |     [Amazon S3]   |  - Storage for static files like images, CSS, and JavaScript.
+      |  (Static Content) |
       \-------------------/
                 |
                 v
@@ -160,9 +159,10 @@ Limited flexibility for customization compared to fully-managed services.
                 |
                 v
       /-------------------\
-      |       [CDN]       |  - Content Delivery Network for caching and delivering static content.
-      |     [Amazon S3]   |  - Storage for static files like images, CSS, and JavaScript.
-      |  (Static Content) |
+      |     [Elastic      |  - AWS Elastic Beanstalk for deploying and managing web applications.
+      |     Beanstalk]    |  - Hosts the ParlAI web application with auto-scaling capabilities.
+      |  [Application]    |  - Deployed application with load balancing and scalability.
+      |   [Auto Scaling]  |  - Automatically adjusts server capacity based on traffic.
       \-------------------/
                 |
                 v
@@ -185,6 +185,18 @@ Higher resource overhead and potential cost implications for smaller deployments
 
       /-------------------\
       |      [Users]      |  - Represents users accessing the ParlAI website.
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |       [CDN]       |  - Optional: Content Delivery Network for caching and delivery.
+      |     [CloudFront]  |  - Accelerates content delivery globally to users.
+      \-------------------/
+                |
+                v
+      /-------------------\
+      |       [S3]        |  - Optional: Amazon S3 bucket for storing static content.
+      |  [Static Hosting] |  - Serves static files like CSS, images, and JavaScript.
       \-------------------/
                 |
                 v
@@ -215,18 +227,6 @@ Higher resource overhead and potential cost implications for smaller deployments
       |  [Docker Image]   |  - Stores the custom Docker image for the web server.
       |  [Image Version:  |  - Versioned image for deployment and scaling.
       |     latest]       |
-      \-------------------/
-                |
-                v
-      /-------------------\
-      |       [S3]        |  - Optional: Amazon S3 bucket for storing static content.
-      |  [Static Hosting] |  - Serves static files like CSS, images, and JavaScript.
-      \-------------------/
-                |
-                v
-      /-------------------\
-      |       [CDN]       |  - Optional: Content Delivery Network for caching and delivery.
-      |     [CloudFront]  |  - Accelerates content delivery globally to users.
       \-------------------/
                 |
                 v
